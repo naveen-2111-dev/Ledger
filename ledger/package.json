@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "dotenv": "^16.4.5",
     "fs-extra": "^11.2.0",
     "mongodb": "^6.9.0",
     "mongoose": "^8.7.2",
