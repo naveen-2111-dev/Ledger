@@ -3,16 +3,23 @@
 import Logger from "@/helper/Request";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
+import {
+  AiOutlineEye,
+  AiOutlineEyeInvisible,
+  AiOutlineLoading3Quarters,
+} from "react-icons/ai";
 
 export default function LoginPage() {
   const [passvisibility, setVisibility] = useState(false);
   const [name, setname] = useState("");
   const [pass, setpass] = useState("");
   const router = useRouter();
+  const [loading, setloading] = useState(false);
 
   const LoginUser = async () => {
     try {
+      console.log("clicked");
+      setloading(!loading);
       const res = await Logger(name, pass);
       if (!res || !res.message) {
         alert("Failed to login");
@@ -22,6 +29,8 @@ export default function LoginPage() {
     } catch (err) {
       console.log(err);
       alert("An error occurred during login.");
+    } finally {
+      setloading(loading);
     }
   };
 
@@ -58,10 +67,14 @@ export default function LoginPage() {
           </div>
         </div>
         <button
-          className="bg-black text-white mt-6 w-full py-3 rounded-lg hover:bg-gray-800 transition-all"
+          className="bg-black text-white mt-6 w-full flex justify-center py-3 rounded-lg hover:bg-gray-800 transition-all"
           onClick={LoginUser}
         >
-          Authenticate me
+          {loading ? (
+            <AiOutlineLoading3Quarters className="text-4xl text-white animate-spin" size={20}/>
+          ) : (
+            "Authendicate me"
+          )}
         </button>
       </div>
     </div>
