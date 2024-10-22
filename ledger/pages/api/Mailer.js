@@ -35,7 +35,6 @@ export default async function POST(req, res) {
             <p style="font-size: 18px; color: #333; line-height: 1.6;">
               Your registration was successful! We're excited to have you join us.
             </p>
-            <img src="${source}" alt="Welcome Image" style="width: 300px; border-radius: 10px; margin-top: 20px; border: 4px solid #007BFF;" />
             <p style="font-size: 16px; color: #666; margin-top: 20px; line-height: 1.6;">
               If you have any questions, feel free to contact our coordinators.
             </p>
