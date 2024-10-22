@@ -1,7 +1,9 @@
+import FormData from "@/components/Form";
+
 export default function HomePage() {
-    return (
-        <div>
-            home
-        </div>
-    )
+  return (
+    <div>
+      <FormData />
+    </div>
+  );
 }
