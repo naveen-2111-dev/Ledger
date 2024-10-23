@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "cookie": "^1.0.1",
+    "crypto-js": "^4.2.0",
     "dotenv": "^16.4.5",
     "fs-extra": "^11.2.0",
     "mongodb": "^6.9.0",
