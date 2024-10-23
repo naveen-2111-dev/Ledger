@@ -6,7 +6,9 @@ import sairam from "@/public/image.png";
 import Image from "next/image";
 import { FaMailchimp, FaLockOpen, FaPrint } from "react-icons/fa";
 import Qrcode from "@/components/Qrcode";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { AiOutlineLoading3Quarters } from "react-icons/ai";
+import Confetti from "react-confetti";
 
 export default function FormData() {
   const [formData, setFormData] = useState({
@@ -21,8 +23,30 @@ export default function FormData() {
     teamLeaderEmail: "",
   });
   const [dataTransfer, setDataTransfer] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, seterror] = useState("");
+  const [confetti, setconfetti] = useState(false);
 
   const Data = JSON.stringify(formData);
+
+  const isValid = () => {
+    for (let key in formData) {
+      if (formData[key] === "") {
+        seterror("fill all fields");
+        return false;
+      }
+    }
+    return true;
+  };
+
+  useEffect(() => {
+    if (error) {
+      const timout = setTimeout(() => {
+        seterror("");
+      }, 2500);
+      return () => clearTimeout(timout);
+    }
+  }, [error, confetti]);
 
   const handleChange = (e) => {
     e.preventDefault();
@@ -35,13 +59,19 @@ export default function FormData() {
 
   const HandleSubmit = (e) => {
     e.preventDefault();
-    setDataTransfer(!dataTransfer);
+    if (isValid()) {
+      setDataTransfer(!dataTransfer);
+    }
   };
 
   const sendEmail = async (e) => {
     e.preventDefault();
+    setLoading(!loading);
     const loc = localStorage.getItem("url");
     try {
+      if (!isValid()) {
+        return;
+      }
       const res = await fetch("/api/Mailer", {
         method: "POST",
         headers: {
@@ -52,13 +82,23 @@ export default function FormData() {
           source: loc,
         }),
       });
+      if (!res.ok) {
+        seterror("failed to send email");
+      }
+      setconfetti(!confetti);
+      setTimeout(() => {
+        setconfetti(false);
+      }, 5000);
     } catch (err) {
       console.log(err);
+    } finally {
+      setLoading(loading);
     }
   };
 
   return (
-    <div className="m-10 p-6 bg-white shadow-md rounded-lg">
+    <div className="m-10 p-6 bg-white shadow-md rounded-lg no-print">
+      {confetti ? <Confetti initialVelocityY={30} /> : ""}
       <h1 className="text-2xl font-bold text-black">Name of Logger</h1>
       <p className="text-sm mt-2 mb-4 text-gray-600">
         You have been granted special access to authenticate users. Please use
@@ -249,23 +289,42 @@ export default function FormData() {
           </div>
         </div>
         <div className="p-6 flex items-start justify-between gap-5">
-          {dataTransfer ? <Qrcode text={Data} /> : ""}
-          <div className="mt-2 flex gap-1">
-            <button
-              className="flex justify-center items-center gap-2 bg-gray-500 p-2 rounded-md text-white hover:scale-105 transition-all duration-300"
-              onClick={HandleSubmit}
-            >
-              Auth <FaLockOpen />
-            </button>
-            <button className="flex justify-center items-center gap-2 bg-blue-500 p-2 rounded-md text-white hover:scale-105 transition-all duration-300">
-              print <FaPrint />
-            </button>
-            <button
-              className="flex justify-center items-center gap-2 bg-red-500 p-2 rounded-md text-white hover:scale-105 transition-all duration-300"
-              onClick={sendEmail}
-            >
-              email <FaMailchimp />
-            </button>
+          <div id="qrCodeContainer">
+            {dataTransfer ? <Qrcode text={Data} /> : ""}
+          </div>
+          <div>
+            <div className="mt-2 flex gap-1">
+              <button
+                className="flex justify-center items-center gap-2 bg-gray-500 p-2 rounded-md text-white hover:scale-105 transition-all duration-300"
+                onClick={HandleSubmit}
+              >
+                Auth <FaLockOpen />
+              </button>
+              <button
+                className="flex justify-center items-center gap-2 bg-blue-500 p-2 rounded-md text-white hover:scale-105 transition-all duration-300"
+                onClick={() => window.print()}
+              >
+                print <FaPrint />
+              </button>
+              <button
+                className="flex justify-center w-20 items-center gap-2 bg-red-500 p-2 rounded-md text-white hover:scale-105 transition-all duration-300"
+                onClick={sendEmail}
+              >
+                {loading ? (
+                  <AiOutlineLoading3Quarters
+                    className="text-4xl text-white animate-spin"
+                    size={20}
+                  />
+                ) : (
+                  <>
+                    email <FaMailchimp />
+                  </>
+                )}
+              </button>
+            </div>
+            <div>
+              <h1 className="text-red-700 font-mono text-sm mt-3">{error}</h1>
+            </div>
           </div>
         </div>
       </form>
