@@ -9,6 +9,7 @@ import Qrcode from "@/components/Qrcode";
 import { useEffect, useState } from "react";
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
 import Confetti from "react-confetti";
+import { Decode } from "@/helper/Cypher";
 
 export default function FormData() {
   const [formData, setFormData] = useState({
@@ -26,6 +27,7 @@ export default function FormData() {
   const [loading, setLoading] = useState(false);
   const [error, seterror] = useState("");
   const [confetti, setconfetti] = useState(false);
+  const [logger, setlogger] = useState("");
 
   const Data = JSON.stringify(formData);
 
@@ -47,6 +49,20 @@ export default function FormData() {
       return () => clearTimeout(timout);
     }
   }, [error, confetti]);
+
+  useEffect(() => {
+    const det = localStorage.getItem("logger");
+
+    if (det) {
+      try {
+        const decrypt = Decode(det);
+        const name = JSON.parse(decrypt);
+        setlogger(name.username);
+      } catch (error) {
+        seterror("Failed to decrypt logger");
+      }
+    }
+  }, []);
 
   const handleChange = (e) => {
     e.preventDefault();
@@ -99,7 +115,7 @@ export default function FormData() {
   return (
     <div className="m-10 p-6 bg-white shadow-md rounded-lg no-print">
       {confetti ? <Confetti initialVelocityY={30} /> : ""}
-      <h1 className="text-2xl font-bold text-black">Name of Logger</h1>
+      <h1 className="text-2xl font-bold text-black">{logger}</h1>
       <p className="text-sm mt-2 mb-4 text-gray-600">
         You have been granted special access to authenticate users. Please use
         this opportunity wisely and responsibly.

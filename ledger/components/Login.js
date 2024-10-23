@@ -1,5 +1,6 @@
 "use client";
 
+import { Encrypt } from "@/helper/Cypher";
 import Logger from "@/helper/Request";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -18,9 +19,11 @@ export default function LoginPage() {
 
   const LoginUser = async () => {
     try {
-      console.log("clicked");
       setloading(!loading);
       const res = await Logger(name, pass);
+      const js = JSON.stringify(res.data);
+      const data = Encrypt(js);
+      localStorage.setItem("logger", data);
       if (!res || !res.message) {
         alert("Failed to login");
         return;
@@ -71,7 +74,10 @@ export default function LoginPage() {
           onClick={LoginUser}
         >
           {loading ? (
-            <AiOutlineLoading3Quarters className="text-4xl text-white animate-spin" size={20}/>
+            <AiOutlineLoading3Quarters
+              className="text-4xl text-white animate-spin"
+              size={20}
+            />
           ) : (
             "Authendicate me"
           )}
