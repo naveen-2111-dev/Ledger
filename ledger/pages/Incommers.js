@@ -6,51 +6,62 @@ import * as FaIcons from "react-icons/fa";
 
 export default function Registrants() {
   const [User, setUser] = useState([]);
+  const [Icons, setIcons] = useState([]);
 
   useEffect(() => {
+    const userIcons = [
+      "FaUser",
+      "FaUserCircle",
+      "FaUserPlus",
+      "FaUserMinus",
+      "FaUserEdit",
+      "FaUserFriends",
+      "FaUserLock",
+      "FaUserShield",
+      "FaUserTie",
+      "FaUsers",
+      "FaUserAstronaut",
+      "FaUserNinja",
+      "FaUserSecret",
+      "FaUserGraduate",
+      "FaUserCheck",
+      "FaUserCog",
+      "FaUserClock",
+      "FaUserAlt",
+      "FaUserTimes",
+      "FaUserAstronaut",
+      "FaUserSecret",
+      "FaUserNinja",
+      "FaUserInjured",
+      "FaUserMd",
+      "FaUserRobot",
+      "FaUserTie",
+      "FaUserGraduate",
+    ];
+
     const fetcher = async () => {
       const Users = await CheckedIN();
       if (Array.isArray(Users)) {
         setUser(Users);
+        if (Icons.length === 0) {
+          const assignedIcons = Users.map(() => {
+            const random = Math.floor(Math.random() * userIcons.length);
+            return FaIcons[userIcons[random]];
+          });
+          setIcons(assignedIcons);
+        }
       } else {
         console.error("Expected an array but got:", Users);
       }
     };
+
+    fetcher();
     const interval = setInterval(() => {
       fetcher();
     }, 1000);
-    return () => clearInterval(interval);
-  }, []);
 
-  const userIcons = [
-    "FaUser",
-    "FaUserCircle",
-    "FaUserPlus",
-    "FaUserMinus",
-    "FaUserEdit",
-    "FaUserFriends",
-    "FaUserLock",
-    "FaUserShield",
-    "FaUserTie",
-    "FaUsers",
-    "FaUserAstronaut",
-    "FaUserNinja",
-    "FaUserSecret",
-    "FaUserGraduate",
-    "FaUserCheck",
-    "FaUserCog",
-    "FaUserClock",
-    "FaUserAlt",
-    "FaUserTimes",
-    "FaUserAstronaut",
-    "FaUserSecret",
-    "FaUserNinja",
-    "FaUserInjured",
-    "FaUserMd",
-    "FaUserRobot",
-    "FaUserTie",
-    "FaUserGraduate",
-  ];
+    return () => clearInterval(interval);
+  }, [Icons]);
 
   return (
     <div className="min-h-screen bg-gray-100">
@@ -60,8 +71,7 @@ export default function Registrants() {
       <div className="flex flex-wrap justify-center p-6 gap-6">
         {User.length > 0 ? (
           User.map((user, index) => {
-            const random = Math.floor(Math.random() * userIcons.length);
-            const RandomIcon = FaIcons[userIcons[random]];
+            const RandomIcon = Icons[index];
             return (
               <div
                 key={index}
