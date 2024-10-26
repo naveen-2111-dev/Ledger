@@ -10,10 +10,13 @@ export function middleware(req) {
   if (!cookie.connected && req.nextUrl.pathname === "/Home") {
     return NextResponse.redirect(new URL("/", req.url));
   }
+  if (!cookie.connected && req.nextUrl.pathname === "/Incommers") {
+    return NextResponse.redirect(new URL("/", req.url));
+  }
 
   return NextResponse.next();
 }
 
 export const config = {
-  matcher: ["/","/Home"],
+  matcher: ["/", "/Home", "/Incommers"],
 };
