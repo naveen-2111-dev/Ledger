@@ -84,7 +84,7 @@ export default function Registrants() {
                   <h1 className="text-2xl font-semibold text-gray-800">
                     {user.eventName}
                   </h1>
-                  <h2 className="text-md text-gray-600">Events</h2>
+                  <h2 className="text-md text-gray-600">{ user.event }</h2>
                   <h3 className="text-md text-gray-600">{user.time}</h3>
                 </div>
               </div>
