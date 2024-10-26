@@ -4,12 +4,24 @@ import "tailwindcss/tailwind.css";
 import "@/app/app.css";
 import sairam from "@/public/image.png";
 import Image from "next/image";
-import { FaMailchimp, FaLockOpen, FaPrint } from "react-icons/fa";
+import {
+  FaMailchimp,
+  FaLockOpen,
+  FaPrint,
+  FaUserCheck,
+  FaFill,
+  FaExclamationTriangle,
+  FaExclamationCircle,
+  FaSyncAlt,
+} from "react-icons/fa";
 import Qrcode from "@/components/Qrcode";
 import { useEffect, useState } from "react";
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
 import Confetti from "react-confetti";
 import { Decode } from "@/helper/Cypher";
+import { MdQrCodeScanner } from "react-icons/md";
+import QrcodePage from "@/pages/Qrcoder";
+import Adder from "@/helper/DataAdder";
 
 export default function FormData() {
   const [formData, setFormData] = useState({
@@ -17,7 +29,7 @@ export default function FormData() {
     event: "",
     teamName: "",
     teamLeaderMobile: "",
-    checkin: "",
+    checkin: false,
     extraField: "",
     teamLeader: "",
     teamMembers: "",
@@ -25,9 +37,12 @@ export default function FormData() {
   });
   const [dataTransfer, setDataTransfer] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [loadings, setLoadings] = useState(false);
   const [error, seterror] = useState("");
   const [confetti, setconfetti] = useState(false);
   const [logger, setlogger] = useState("");
+  const [pop, setpop] = useState(false);
+  const [success, setSuccess] = useState("");
 
   const Data = JSON.stringify(formData);
 
@@ -45,10 +60,20 @@ export default function FormData() {
     if (error) {
       const timout = setTimeout(() => {
         seterror("");
+        setSuccess("");
       }, 2500);
       return () => clearTimeout(timout);
     }
-  }, [error, confetti]);
+  }, [error]);
+
+  useEffect(() => {
+    if (success) {
+      const timout = setTimeout(() => {
+        setSuccess("");
+      }, 2500);
+      return () => clearTimeout(timout);
+    }
+  }, [success]);
 
   useEffect(() => {
     const det = localStorage.getItem("logger");
@@ -67,16 +92,54 @@ export default function FormData() {
   const handleChange = (e) => {
     e.preventDefault();
     const { name, value } = e.target;
+    const newValue = name === "checkin" ? value === "true" : value;
     setFormData((prevData) => ({
       ...prevData,
-      [name]: value,
+      [name]: newValue,
     }));
   };
 
-  const HandleSubmit = (e) => {
+  const HandleSubmit = async (e) => {
     e.preventDefault();
-    if (isValid()) {
+    if (!isValid()) {
+      seterror(
+        <span className="flex items-center gap-3">
+          Fill all fields <FaFill />
+        </span>
+      );
+      return;
+    }
+
+    setLoadings(true);
+
+    try {
+      const success = await Adder(
+        formData.collegeName,
+        formData.teamMembers,
+        formData.teamLeaderEmail,
+        formData.event,
+        formData.checkin
+      );
+
+      if (!success) {
+        seterror(
+          <span className="flex items-center gap-3">
+            {success.message} <FaExclamationCircle />
+          </span>
+        );
+        return;
+      }
+
       setDataTransfer(!dataTransfer);
+      setSuccess("User added to db");
+    } catch (error) {
+      seterror(
+        <span className="flex items-center gap-3">
+          {error.message} <FaExclamationCircle />
+        </span>
+      );
+    } finally {
+      setLoadings(false);
     }
   };
 
@@ -99,8 +162,24 @@ export default function FormData() {
         }),
       });
       if (!res.ok) {
-        seterror("failed to send email");
+        seterror(
+          <span className="flex items-center gap-3">
+            failed to send email <FaExclamationTriangle />
+          </span>
+        );
+        return;
       }
+      // setFormData({
+      //   collegeName: "",
+      //   event: "",
+      //   teamName: "",
+      //   teamLeaderMobile: "",
+      //   checkin: false,
+      //   extraField: "",
+      //   teamLeader: "",
+      //   teamMembers: "",
+      //   teamLeaderEmail: "",
+      // });
       setconfetti(!confetti);
       setTimeout(() => {
         setconfetti(false);
@@ -113,13 +192,28 @@ export default function FormData() {
   };
 
   return (
-    <div className="m-10 p-6 bg-white shadow-md rounded-lg no-print">
+    <div className="m-10 p-6 bg-white shadow-md rounded-lg no-print font">
       {confetti ? <Confetti initialVelocityY={30} /> : ""}
-      <h1 className="text-2xl font-bold text-black">{logger}</h1>
-      <p className="text-sm mt-2 mb-4 text-gray-600">
-        You have been granted special access to authenticate users. Please use
-        this opportunity wisely and responsibly.
-      </p>
+      <div className="flex justify-between items-center">
+        <div>
+          <h1 className="text-2xl font-bold text-black">{logger}</h1>
+          <p className="text-sm mt-2 mb-4 text-gray-600">
+            You have been granted special access to authenticate users. Please
+            use this opportunity wisely and responsibly.
+          </p>
+        </div>
+        <div className="flex justify-center items-center gap-4 m-5 text-black">
+          <MdQrCodeScanner
+            onClick={() => setpop(!pop)}
+            className="hover:bg-gray-400 p-1 rounded-sm transition-all duration-700"
+            size={30}
+          />
+          <FaUserCheck
+            className="hover:bg-gray-400 p-1 rounded-sm transition-all duration-700"
+            size={30}
+          />
+        </div>
+      </div>
       <form className="mt-6 border rounded-md overflow-hidden">
         <div className="p-2 bg-gray-400 rounded-t-md flex items-center justify-between">
           <Image src={sairam} alt="sairam logo" height={50} />
@@ -202,20 +296,23 @@ export default function FormData() {
               >
                 Check-in
               </label>
-              <input
-                type="text"
+              <select
                 id="checkin"
                 name="checkin"
-                value={formData.checkin}
+                value={formData.checkin ? "true" : "false"}
                 onChange={handleChange}
-                className="p-2 border border-gray-600 rounded-md focus:outline-none focus:ring focus:ring-blue-300 transition duration-150 ease-in-out"
-              />
+                className="p-2 border bg-transparent text-gray-600 border-gray-600 rounded-md focus:outline-none focus:ring focus:ring-blue-300 transition duration-150 ease-in-out"
+              >
+                <option value="">Checkin state</option>
+                <option value="true">Yes</option>
+                <option value="false">No</option>
+              </select>
 
               <label
                 htmlFor="extraField"
                 className="mt-4 mb-1 font-medium text-gray-800"
               >
-                Extra Field
+                CheckinTime
               </label>
               <input
                 type="text"
@@ -311,10 +408,19 @@ export default function FormData() {
           <div>
             <div className="mt-2 flex gap-1">
               <button
-                className="flex justify-center items-center gap-2 bg-gray-500 p-2 rounded-md text-white hover:scale-105 transition-all duration-300"
+                className="flex justify-center w-20 items-center gap-2 bg-gray-500 p-2 rounded-md text-white hover:scale-105 transition-all duration-300"
                 onClick={HandleSubmit}
               >
-                Auth <FaLockOpen />
+                {loadings ? (
+                  <AiOutlineLoading3Quarters
+                    className="text-4xl text-white animate-spin"
+                    size={20}
+                  />
+                ) : (
+                  <>
+                    Auth <FaLockOpen />
+                  </>
+                )}
               </button>
               <button
                 className="flex justify-center items-center gap-2 bg-blue-500 p-2 rounded-md text-white hover:scale-105 transition-all duration-300"
@@ -337,13 +443,23 @@ export default function FormData() {
                   </>
                 )}
               </button>
+              <button
+                className="p-3 rounded-md text-black"
+                onClick={() => location.reload()}
+              >
+                <FaSyncAlt />
+              </button>
             </div>
             <div>
               <h1 className="text-red-700 font-mono text-sm mt-3">{error}</h1>
+              <h1 className="text-green-700 font-mono text-sm mt-3">
+                {success}
+              </h1>
             </div>
           </div>
         </div>
       </form>
+      <div className="absolute z-10">{pop ? <QrcodePage /> : ""}</div>
     </div>
   );
 }

@@ -10,7 +10,7 @@ export default async function POST(req, res) {
 
     const collection = await ConnectDb();
     let userData;
-    const User = await collection.findOne({ username });
+    const User = await collection.collection.findOne({ username });
     userData = User;
 
     if (!User) {

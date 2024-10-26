@@ -13,6 +13,7 @@
     "crypto-js": "^4.2.0",
     "dotenv": "^16.4.5",
     "fs-extra": "^11.2.0",
+    "html5-qrcode": "^2.3.8",
     "mongodb": "^6.9.0",
     "mongoose": "^8.7.2",
     "next": "14.2.15",
