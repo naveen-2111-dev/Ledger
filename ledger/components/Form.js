@@ -22,6 +22,7 @@ import { Decode } from "@/helper/Cypher";
 import { MdQrCodeScanner } from "react-icons/md";
 import QrcodePage from "@/pages/Qrcoder";
 import Adder from "@/helper/DataAdder";
+import { useRouter } from "next/navigation";
 
 export default function FormData() {
   const [formData, setFormData] = useState({
@@ -43,6 +44,7 @@ export default function FormData() {
   const [logger, setlogger] = useState("");
   const [pop, setpop] = useState(false);
   const [success, setSuccess] = useState("");
+  const router = useRouter();
 
   const Data = JSON.stringify(formData);
 
@@ -211,6 +213,7 @@ export default function FormData() {
           <FaUserCheck
             className="hover:bg-gray-400 p-1 rounded-sm transition-all duration-700"
             size={30}
+            onClick={() => router.push("/Incommers")}
           />
         </div>
       </div>
