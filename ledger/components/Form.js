@@ -196,15 +196,15 @@ export default function FormData() {
   return (
     <div className="m-10 p-6 bg-white shadow-md rounded-lg no-print font">
       {confetti ? <Confetti initialVelocityY={30} /> : ""}
-      <div className="flex justify-between items-center">
-        <div>
+      <div className="flex flex-col justify-between items-center p-4 sm:flex-row sm:justify-between">
+        <div className="text-center sm:text-left">
           <h1 className="text-2xl font-bold text-black">{logger}</h1>
           <p className="text-sm mt-2 mb-4 text-gray-600">
             You have been granted special access to authenticate users. Please
             use this opportunity wisely and responsibly.
           </p>
         </div>
-        <div className="flex justify-center items-center gap-4 m-5 text-black">
+        <div className="flex justify-center items-center gap-4 m-5 text-black sm:m-0">
           <MdQrCodeScanner
             onClick={() => setpop(!pop)}
             className="hover:bg-gray-400 p-1 rounded-sm transition-all duration-700"
@@ -217,10 +217,11 @@ export default function FormData() {
           />
         </div>
       </div>
+
       <form className="mt-6 border rounded-md overflow-hidden">
-        <div className="p-2 bg-gray-400 rounded-t-md flex items-center justify-between">
+        <div className="p-2 bg-gray-400 rounded-t-md flex flex-col sm-flex-row md:flex-row md:justify-between lg:flex-row xl:flex-row items-center justify-between">
           <Image src={sairam} alt="sairam logo" height={50} />
-          <h1 className="p-2 text-black capitalize text-lg font-semibold">
+          <h1 className="p-2 text-black text-center capitalize text-lg font-semibold">
             sri sairam college of engineering
           </h1>
         </div>
@@ -385,6 +386,19 @@ export default function FormData() {
                 <label htmlFor="member3" className="text-gray-800">
                   3
                 </label>
+
+                <input
+                  type="radio"
+                  id="member4"
+                  name="teamMembers"
+                  value="4"
+                  checked={formData.teamMembers === "4"}
+                  onChange={handleChange}
+                  className="mr-1"
+                />
+                <label htmlFor="member4" className="text-gray-800">
+                  4
+                </label>
               </div>
 
               <label
@@ -404,12 +418,12 @@ export default function FormData() {
             </div>
           </div>
         </div>
-        <div className="p-6 flex items-start justify-between gap-5">
-          <div id="qrCodeContainer">
+        <div className="p-6 flex flex-col justify-center items-center sm:flex-row gap-5">
+          <div id="qrCodeContainer" className="flex-1">
             {dataTransfer ? <Qrcode text={Data} /> : ""}
           </div>
-          <div>
-            <div className="mt-2 flex gap-1">
+          <div className="flex flex-col flex-1 items-center sm:items-end">
+            <div className="mt-2 flex flex-col sm:flex-row justify-end items-center gap-1">
               <button
                 className="flex justify-center w-20 items-center gap-2 bg-gray-500 p-2 rounded-md text-white hover:scale-105 transition-all duration-300"
                 onClick={HandleSubmit}
@@ -426,10 +440,10 @@ export default function FormData() {
                 )}
               </button>
               <button
-                className="flex justify-center items-center gap-2 bg-blue-500 p-2 rounded-md text-white hover:scale-105 transition-all duration-300"
+                className="flex justify-center w-20 items-center gap-2 bg-blue-500 p-2 rounded-md text-white hover:scale-105 transition-all duration-300"
                 onClick={() => window.print()}
               >
-                print <FaPrint />
+                Print <FaPrint />
               </button>
               <button
                 className="flex justify-center w-20 items-center gap-2 bg-red-500 p-2 rounded-md text-white hover:scale-105 transition-all duration-300"
@@ -442,7 +456,7 @@ export default function FormData() {
                   />
                 ) : (
                   <>
-                    email <FaMailchimp />
+                    Email <FaMailchimp />
                   </>
                 )}
               </button>
@@ -453,11 +467,9 @@ export default function FormData() {
                 <FaSyncAlt />
               </button>
             </div>
-            <div>
-              <h1 className="text-red-700 font-mono text-sm mt-3">{error}</h1>
-              <h1 className="text-green-700 font-mono text-sm mt-3">
-                {success}
-              </h1>
+            <div className="text-center mt-3 sm:mt-2">
+              <h1 className="text-red-700 font-mono text-sm">{error}</h1>
+              <h1 className="text-green-700 font-mono text-sm">{success}</h1>
             </div>
           </div>
         </div>

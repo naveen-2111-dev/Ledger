@@ -104,7 +104,7 @@ export default function Registrants() {
         ) : (
           <p>
             <AiOutlineLoading3Quarters
-              className="text-4xl text-black animate-spin"
+              className="text-4xl text-black animate-spin flex justify-center h-screen"
               size={100}
             />
           </p>
